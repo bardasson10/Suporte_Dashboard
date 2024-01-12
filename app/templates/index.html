@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %} {{ super() }} - Suporte {% endblock %}
+{% block content %}
+    {% if user %}
+    <p id="1">Bem vindo ao dash CTT {{ user }}</p>
+    {% else %}
+    <p>bem vindo ao dash</p>
+    {% endif %}
+{% endblock %}
