@@ -1,11 +1,22 @@
 /* static/style.css */
 html, body {
-    height: 100%;
-    margin: 0;
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
   }
+
+#logo {
+  padding: 40px 0 40px 0;
+}
+
+#logo >img {
+
+  width: 400px;
+  
+}
 .con {
 
-    background-image: url('../fontes/login.jpg');
+    /*background-image: url('../fontes/login1.jpeg');*/
     background-size: cover; /* Ajusta a imagem para cobrir todo o elemento de fundo */
     background-position: center; /* Centraliza a imagem */
     background-repeat: no-repeat; /* Impede a repetição da imagem */
@@ -25,6 +36,18 @@ html, body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
   #form{
-    padding-top: 20px;
+    padding: 30px 0 30px 0;
     text-align: start;
   }
+
+  .svg-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    flex-shrink: 0; /* Evita que a div afete o tamanho do conteúdo principal */
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+}
