@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block title %} {{ super() }} - Suporte {% endblock %}
 {% block content %}
+
+<h1>bem vindo ao dash {{current_user.name}}</h1>
+<a href="{{url_for('logout')}}">sair</a>
     {% if user %}
     <p id="1">Bem vindo ao dash CTT {{ user }}</p>
     {% else %}

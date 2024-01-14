@@ -1,6 +1,12 @@
-from app import db
+from app import db,login_manager,bcrypt
+from flask_login import UserMixin
 
-class User(db.Model):
+
+@login_manager.user_loader
+def get_user (user_id):
+    return User.query.filter_by(id =user_id).first()
+
+class User(db.Model, UserMixin):
     __tablename__ = "users"
 
     id = db.Column(db.Integer,primary_key=True)
@@ -10,8 +16,11 @@ class User(db.Model):
 
     def __init__(self,username,password,name) :
         self.username = username
-        self.password = password
+        self.password= bcrypt.generate_password_hash(password).decode('utf-8')
         self.name = name
+
+    def verify_password(self,pwd) :
+       return bcrypt.check_password_hash(self.password, pwd)
         
     def __repr__(self):
-        return "<User %r>"% self.username    
+        return "<User %r>"% self.username
