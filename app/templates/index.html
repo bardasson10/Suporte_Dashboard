@@ -21,21 +21,110 @@
 
   <div>
     <h3>Tabela de Tickets</h3>
+    <!-- Exibe mensagens de erro -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-danger">
+      {{ messages[0] }}
+    </div>
+    {% endif %}
+    {% endwith %}
 
+    <!-- Parte do seu código HTML -->
+
+<form id="paginationForm" method="get">
+    <!-- Outros campos do formulário -->
+    <label for="per_page">Itens por página:</label>
+    <select id="per_page" name="per_page" onchange="submitForm()">
+        <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+        <option value="20" {% if per_page == 20 %}selected{% endif %}>20</option>
+        <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+        <!-- Adicione mais opções conforme necessário -->
+    </select>
+</form>
+
+<script>
+    function submitForm() {
+        var perPageValue = document.getElementById("per_page").value;
+        var start_date = document.getElementById("start_date").value;
+        var end_date = document.getElementById("end_date").value;
+
+        // Armazena os valores no armazenamento local
+        localStorage.setItem("per_page", perPageValue);
+        localStorage.setItem("start_date", start_date);
+        localStorage.setItem("end_date", end_date);
+
+        document.getElementById("paginationForm").submit();
+    }
+
+    // Defina os valores padrão ao carregar a página
+    document.addEventListener("DOMContentLoaded", function() {
+        var perPageValue = localStorage.getItem("per_page");
+        var start_date = localStorage.getItem("start_date");
+        var end_date = localStorage.getItem("end_date");
+
+        if (perPageValue !== null) {
+            document.getElementById("per_page").value = perPageValue;
+        }
+        if (start_date !== null) {
+            document.getElementById("start_date").value = start_date;
+        }
+        if (end_date !== null) {
+            document.getElementById("end_date").value = end_date;
+        }
+    });
+</script>
+
+
+
+<!-- Restante do seu código HTML -->
+
+    <form class="d-flex" method="get" action="{{ url_for('index') }}">
+      <div class="form-group mr-2" style="margin: 0 15px 5px 15px;">
+        <label for="start_date" class="mr-2">Data Inicial:</label>
+        <input type="date" class="form-control" name="start_date" id="start_date" value="{{ start_date }}"
+          style="margin: 0 15px 5 15px;">
+      </div>
+
+      <div class="form-group mr-2" style="margin: 0 0 5px 0;">
+        <label for="end_date" class="mr-2">Data Final:</label>
+        <input type="date" class="form-control" name="end_date" id="end_date" value="{{ end_date }}">
+      </div>
+
+      <div class="align-self-end ml-2" style="margin: 0 15px 5px 15px;">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+      </div>
+    </form>
+
+
+
+
+    </form>
+
+
+    {% if error_message %}
+    <p>{{ error_message }}</p>
+    {% endif %}
     <!-- Campos de Pesquisa -->
-    <div class="row mb-3">
-      <div class="col-md-4">
+    <div class="row">
+      <div class="col-md-2 mb-2">
         <input type="text" class="form-control" placeholder="Número do Ticket" id="searchTicketNumber">
       </div>
-      <div class="col-md-4">
+      <div class="col-md-2 mb-2">
         <input type="text" class="form-control" placeholder="Título" id="searchTitle">
       </div>
-      <div class="col-md-4">
+      <div class="col-md-2 mb-2">
         <input type="text" class="form-control" placeholder="Email do Solicitante" id="searchRequestorEmail">
+      </div>
+      <div class="col-md-2 mb-2">
+        <input type="text" class="form-control" placeholder="Cliente" id="searchClient">
+      </div>
+      <div class="col-md-2 mb-2">
+        <input type="text" class="form-control" placeholder="Responsável" id="searchResponsible">
       </div>
     </div>
     
-    <div class="table-responsive small">
+    <div class="table-responsive">
       <table class="table table-striped table-sm">
         <thead>
           <tr>
@@ -44,6 +133,8 @@
             <th scope="col">Título</th>
             <th scope="col">Criado em</th>
             <th scope="col">Email do Solicitante</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Responsável</th>
             <th scope="col">Ação</th> <!-- Nova coluna para o botão "Visualizar" -->
           </tr>
         </thead>
@@ -55,22 +146,27 @@
             <td>{{ ticket.title }}</td>
             <td>{{ ticket.created_at }}</td>
             <td>{{ ticket.requestor_email }}</td>
+            <td>{{ ticket.client['name']}}</td>
+            <td>{{ ticket.responsible['name']}}</td>
             <td>
-              <a class="btn btn-primary" href="{{ url_for('apontamentos',ticketNumber=ticket.ticket_number) }}">Apontamentos</a>
+              <a class="btn btn-primary"
+                href="{{ url_for('apontamentos',ticketNumber=ticket.ticket_number) }}">Apontamentos</a>
 
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
-    
+
       <!-- Marcação de Paginação para a Tabela -->
       {% if pagination %}
       <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
           {% if pagination.has_prev %}
           <li class="page-item">
-            <a class="page-link" href="{{ url_for('index', page=pagination.prev_num, per_page=pagination.per_page) }}" aria-label="Previous">
+            <a class="page-link"
+              href="{{ url_for('index', page=pagination.prev_num, per_page=pagination.per_page, start_date=start_date, end_date=end_date) }}"
+              aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
@@ -79,16 +175,20 @@
             <span class="page-link" aria-hidden="true">&laquo;</span>
           </li>
           {% endif %}
-    
+
           {% for page_num in pagination.pages %}
           <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
-            <a class="page-link" href="{{ url_for('index', page=page_num, per_page=pagination.per_page) }}">{{ page_num }}</a>
+            <a class="page-link"
+              href="{{ url_for('index', page=page_num, per_page=pagination.per_page, start_date=start_date, end_date=end_date) }}">{{
+              page_num }}</a>
           </li>
           {% endfor %}
-    
+
           {% if pagination.has_next %}
           <li class="page-item">
-            <a class="page-link" href="{{ url_for('index', page=pagination.page + 1, per_page=pagination.per_page) }}" aria-label="Next">
+            <a class="page-link"
+              href="{{ url_for('index', page=pagination.page + 1, per_page=pagination.per_page, start_date=start_date, end_date=end_date) }}"
+              aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>
@@ -99,9 +199,10 @@
           {% endif %}
         </ul>
       </nav>
+
       {% endif %}
     </div>
-    
+
     <!-- Script jQuery para filtrar a tabela -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -110,31 +211,43 @@
           var inputTicketNumber = $('#searchTicketNumber').val().toLowerCase();
           var inputTitle = $('#searchTitle').val().toLowerCase();
           var inputRequestorEmail = $('#searchRequestorEmail').val().toLowerCase();
-    
+          var inputClient = $('#searchClient').val().toLowerCase();
+          var inputResponsible = $('#searchResponsible').val().toLowerCase();
+
           $('tbody tr').each(function () {
             var ticketNumber = $(this).find('td:eq(1)').text().toLowerCase();
             var title = $(this).find('td:eq(2)').text().toLowerCase();
             var requestorEmail = $(this).find('td:eq(4)').text().toLowerCase();
-    
+            var client = $(this).find('td:eq(5)').text().toLowerCase();
+            var responsible = $(this).find('td:eq(6)').text().toLowerCase();
+
             var matchesTicketNumber = ticketNumber.includes(inputTicketNumber);
             var matchesTitle = title.includes(inputTitle);
             var matchesRequestorEmail = requestorEmail.includes(inputRequestorEmail);
-    
-            $(this).toggle(matchesTicketNumber && matchesTitle && matchesRequestorEmail);
+            var matchesClient = client.includes(inputClient);
+            var matchesResponsible = responsible.includes(inputResponsible);
+
+            $(this).toggle(matchesTicketNumber && matchesTitle && matchesRequestorEmail && matchesClient && matchesResponsible);
           });
         }
-    
-        $('#searchTicketNumber, #searchTitle, #searchRequestorEmail').on('input', filterTable);
+
+        // Use 'input' e 'change' para lidar com diferentes tipos de eventos nos campos de entrada
+        $('#searchTicketNumber, #searchTitle, #searchRequestorEmail, #searchClient, #searchResponsible').on('input change', filterTable);
+
+        // Adicione um console.log para verificar se o script está sendo executado
+        console.log('Script executado com sucesso.');
       });
     </script>
+
 
 
     <h3>Gráfico de Tickets Criados por Dia</h3>
 
     <div class="container">
-      <!-- Aqui está a tag img para exibir o gráfico -->
-      <img src="data:image/png;base64,{{ img_base64 }}" alt="Gráfico de Tickets">
-    </div>
+      <!-- Adicione as classes do Bootstrap para tornar a imagem responsiva -->
+      <img src="data:image/png;base64,{{ img_base64 }}" alt="Gráfico de Tickets" class="img-fluid">
+  </div>
+  
 
   </div>
 </main>

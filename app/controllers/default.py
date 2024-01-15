@@ -1,26 +1,43 @@
-from flask import render_template, Response
+from flask import render_template,redirect, url_for, flash,request
 from app import app
 from flask_login import login_required
 from app.api.tickets import make_api_request
 from flask_paginate import Pagination, get_page_args
+from io import BytesIO
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from io import BytesIO
 import base64
+
 
 @app.route("/")
 @login_required
 def index():
+
+     # Obter as datas do formulário ou utilizar valores padrão
+    start_date = request.args.get('start_date', '')
+    end_date = request.args.get('end_date', '')
+
+    # Validar as datas
+    try:
+        pd.to_datetime(start_date)
+        pd.to_datetime(end_date)
+    except ValueError:
+        return render_template('index.html', error_message="Erro: Formato de data inválido.", start_date=start_date, end_date=end_date)
+    
+   # Obter o número de elementos por página ou usar um valor padrão (10)
+    per_page = int(request.args.get('per_page', 10))
+
     # URL da API e parâmetros da solicitação
     api_url = "https://api.tiflux.com/api/v1/tickets"
     params = {
         'limit': 200,
-        'start_date': '2023-01-01',
-        'end_date': '2023-12-03',
+        'start_date': start_date,
+        'end_date': end_date,
         'is_closed': 'true',
     }
+
 
     api_data = make_api_request(api_url, params)
 
@@ -29,7 +46,10 @@ def index():
 
     # Verifica se a coluna 'created_at' está presente
     if 'created_at' not in df.columns:
-        return "Erro: A coluna 'created_at' não está presente nos dados da API."
+        # Envia uma mensagem de erro para a próxima solicitação
+        flash("Error: nao possui dados de retorno da api para este horario informado")
+        # Redireciona para a rota '/'
+        return redirect(url_for('index'))
 
     # Certifique-se de ajustar o nome da coluna 'created_at' de acordo com os dados reais
     df['created_at'] = pd.to_datetime(df['created_at'])
@@ -71,11 +91,9 @@ def index():
     # Limpa a figura para evitar problemas
     plt.close()
 
-    # Adicione os dados da API e da paginação ao contexto do template
-    # ...
 
 # Adicione os dados da API e da paginação ao contexto do template
-    return render_template('index.html', tickets=data_for_current_page.to_dict(orient='records'), img_base64=img_base64, pagination=pagination)
+    return render_template('index.html', tickets=data_for_current_page.to_dict(orient='records'), img_base64=img_base64, pagination=pagination, start_date=start_date, end_date=end_date)
 
 
 
