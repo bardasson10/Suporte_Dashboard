@@ -1,4 +1,4 @@
-from flask import render_template,redirect,url_for,request
+from flask import render_template,redirect,url_for,request,flash
 from flask_login import login_user,logout_user
 from app import app,db
 from app.models.tables import User
@@ -11,6 +11,7 @@ def login():
         
         userExist = User.query.filter_by(username=user).first()
         if not userExist or not userExist.verify_password(pwd):
+            flash('Incorrect username or password', 'error')
             return redirect(url_for('login'))
         
         login_user(userExist)  
