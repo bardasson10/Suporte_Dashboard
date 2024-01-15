@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %} {{ super() }} - Suporte {% endblock %}
+{% block content %}
+
+
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1>Detalhes do Apontamento</h1>
+    </div>
+    
+
+    {% if data %}
+    <ul>
+        {% for apontamento in data %}
+            <li>ID: {{ apontamento.id }}</li>
+            <li>Cliente: {{ apontamento.client.client_name }}</li>
+            <li>Usuário: {{ apontamento.user.name }}</li>
+            <li>Início: {{ apontamento.beginning }}</li>
+            <li>Fim: {{ apontamento.ending }}</li>
+            <li>Descrição: {{ apontamento.description }}</li>
+            <hr> <!-- Adiciona uma linha horizontal entre os apontamentos -->
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhum dado disponível.</p>
+{% endif %}
+
+<a class="btn btn-dark" href="{{ url_for('index') }}">voltar pagina inicial</a>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+
+{% endblock %}
