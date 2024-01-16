@@ -94,13 +94,24 @@
     </div>
   </div>
  
-
   <div class="container mt-5">
-    <h1 class="text-center">Gráfico de Tickets</h1>
+    <div class="row">
+        <!-- Primeiro gráfico -->
+        <div class="col-12 col-md-6">
+            <h1 class="text-center">Gráfico de Tickets</h1>
+            <div>{{ plot | safe }}</div>
+        </div>
 
-    <!-- Mostrar o gráfico Plotly -->
-    <div>{{ plot | safe }}</div>
+        <!-- Segundo gráfico -->
+        <div class="col-12 col-md-6">
+            <h1 class="text-center"> Tickets por atendente</h1>
+            {{ plot_responsible_on_date|safe }}
+            <!-- Adicione o gráfico de barras padrão aqui -->
+            <div>{{ plot|safe }}</div>
+        </div>
+    </div>
 </div>
+
 
 </main>
 
