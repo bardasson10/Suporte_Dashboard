@@ -1,12 +1,16 @@
 from flask import Flask, render_template, request
-from app.api.tickets import make_api_request  # Import your existing function
+from app.api.tickets import make_api_request
+from flask_login import login_required  # Import your existing function
 from app import app
 import plotly.express as px
 import pandas as pd
 
 
 @app.route("/", methods=['GET', 'POST'])
+@login_required
 def index():
+
+    
     ticketNumber = None
 
     if request.method == 'POST':
@@ -19,9 +23,10 @@ def index():
             'end_date': end_date,
             'is_closed': 'true',
         }
+
         api_data = make_api_request(api_url, params)
 
-        if api_data:
+        if api_data:  # Certifique-se de que api_data não é None antes de acessá-lo
             ticketNumber = api_data[0].get('ticket_number')
 
         # Crie um gráfico de barras com Plotly

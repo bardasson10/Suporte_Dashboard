@@ -2,90 +2,84 @@
 {% block title %} {{ super() }} - Suporte {% endblock %}
 {% block content %}
 
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="margin-bottom: 100px;">
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-      <h1 class="h2">Dashboard</h1>
-      <div class="btn-toolbar mb-2 mb-md-0">
-          <div class="btn-group me-2">
-              <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-          </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
-              <svg class="bi">
-                  <use xlink:href="#calendar3" />
-              </svg>
-              This week
-          </button>
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+      <div class="btn-group me-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
       </div>
+      <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
+        <svg class="bi">
+          <use xlink:href="#calendar3" />
+        </svg>
+        This week
+      </button>
+    </div>
   </div>
   <div class="container-fluid">
     <form method="post" class="mb-3">
       <div class="form-row">
-          <div class="col-md-4">
-              <label for="start_date">Start Date:</label>
-              <input type="date" class="form-control" id="start_date" name="start_date">
-          </div>
-          <div class="col-md-4">
-              <label for="end_date">End Date:</label>
-              <input type="date" class="form-control" id="end_date" name="end_date">
-          </div>
-          <div class="col-md-2">
-              <label class="invisible">Filter:</label>
-              <button type="submit" class="btn btn-primary btn-block ">Filter</button>
-          </div>
+        <div class="col-md-4">
+          <label for="start_date">Start Date:</label>
+          <input type="date" class="form-control" id="start_date" name="start_date">
+        </div>
+        <div class="col-md-4">
+          <label for="end_date">End Date:</label>
+          <input type="date" class="form-control" id="end_date" name="end_date">
+        </div>
+        <div class="col-md-2">
+          <label class="invisible">Filter:</label>
+          <button type="submit" class="btn btn-primary btn-block ">Filter</button>
+        </div>
       </div>
-  </form>
-  
+    </form>
+
     <div class="table-responsive">
-        <table id="ticketTable" class="table table-bordered table-striped">
-            <thead class="thead-light">
-                <tr>
-                    <th>Ticket Number</th>
-                    <th>Title</th>
-                    <th>Responsible Name</th>
-                    <th>Date</th>
-                    <th>Apontamentos</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ticket in api_data %}
-                    <tr>
-                        <td>{{ ticket.ticket_number }}</td>
-                        <td>{{ ticket.title }}</td>
-                        <td>{{ ticket.responsible.name if ticket.responsible else '' }}</td>
-                        <td>{{ ticket.created_at }}</td>
-                        <td><a class="btn btn-primary" href="{{ url_for('apontamentos', ticketNumber=ticketNumber) }}">Apontamentos</a></td>
-
-
-                        <!-- Add more cells based on your API response -->
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+      <table id="ticketTable" class="table table-bordered table-striped">
+        <thead class="thead-light">
+          <tr>
+            <th>Ticket Number</th>
+            <th>Title</th>
+            <th>Responsible Name</th>
+            <th>Date</th>
+            <th>Apontamentos</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ticket in api_data %}
+          <tr>
+            <td>{{ ticket.ticket_number }}</td>
+            <td>{{ ticket.title }}</td>
+            <td>{{ ticket.responsible.name if ticket.responsible else '' }}</td>
+            <td>{{ ticket.created_at }}</td>
+            <td><a class="btn btn-primary"
+              href="{{ url_for('apontamentos', ticketNumber=ticket.ticket_number) }}">Apontamentos</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-</div>
+  </div>
 
+  <h1>Gráfico de Tickets</h1>
 
-
-<h1>Gráfico de Tickets</h1>
-
-<!-- Mostrar o gráfico Plotly -->
-<div>{{ plot | safe }}</div>
+  <!-- Mostrar o gráfico Plotly -->
+  <div>{{ plot | safe }}</div>
 </main>
 
 <script>
   // Initialize DataTable
-  $(document).ready( function () {
-      $('#ticketTable').DataTable();
+  $(document).ready(function () {
+    $('#ticketTable').DataTable();
   });
 
   $(document).on('change', '#start_date, #end_date', function (e) {
-        e.preventDefault(); // Evita o comportamento padrão do formulário
-        // ... restante do script ...
-    });
+    e.preventDefault(); 
+  });
 </script>
 
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script> -->
 
 {% endblock %}

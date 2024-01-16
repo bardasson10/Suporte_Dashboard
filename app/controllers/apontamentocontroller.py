@@ -1,9 +1,6 @@
-# app/controllers/apontamentos_controller.py
-
 from flask import render_template
 from app.api.tickets import make_api_request
 from app import app
-
 
 @app.route('/apontamentos/<int:ticketNumber>')
 def apontamentos(ticketNumber):
@@ -15,7 +12,10 @@ def apontamentos(ticketNumber):
         data = make_api_request(url)
 
         if data:
-            # Renderiza a página de visualização com os dados da API
+            # Ordena os apontamentos do mais antigo para o mais recente
+            data.sort(key=lambda x: x.get('created_at', ''))
+
+            # Renderiza a página de visualização com os dados da API ordenados
             return render_template('apontamentos.html', data=data)
         else:
             # Lida com erros de chamada à API
