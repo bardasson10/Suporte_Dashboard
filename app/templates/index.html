@@ -4,22 +4,33 @@
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="margin-bottom: 100px;">
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Dashboard</h1>
+    <h1 class="h2">Scrum - Suporte</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group me-2">
-        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+        <button class="btn btn-sm btn-outline-secondary" id="exportButton">Exportar para Excel</button>
       </div>
-      <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
-        <svg class="bi">
-          <use xlink:href="#calendar3" />
-        </svg>
-        This week
-      </button>
     </div>
   </div>
   <div class="container-fluid">
     <form method="post" class="mb-3" id="filterForm">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="cont_alert">
+                <ul class="list-unstyled">
+                    {% for category, message in messages %}
+                        <li class="alert alert-danger alert-dismissible fade show" role="alert" style="max-width: 520px;">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endwith %}
+
       <div class="form-row">
           <div class="col-md-4">
               <label for="start_date">Start Date:</label>
@@ -47,7 +58,9 @@
   </form>
   
     <div class="table-responsive">
+      
       <table id="ticketTable" class="table table-bordered table-striped">
+        
         <thead class="thead-light">
           <tr>
             <th>Ticket Number</th>
@@ -80,40 +93,17 @@
       </table>
     </div>
   </div>
+ 
 
-  <h1>Gráfico de Tickets</h1>
+  <div class="container mt-5">
+    <h1 class="text-center">Gráfico de Tickets</h1>
 
-  <!-- Mostrar o gráfico Plotly -->
-  <div>{{ plot | safe }}</div>
+    <!-- Mostrar o gráfico Plotly -->
+    <div>{{ plot | safe }}</div>
+</div>
+
 </main>
 
-<script>
-  // Initialize DataTable
-  $(document).ready(function () {
-    $('#ticketTable').DataTable();
-  });
 
-  $(document).on('change', '#start_date, #end_date', function (e) {
-    e.preventDefault(); 
-  });
-
-  $(document).ready(function () {
-        // Obtenha o valor anteriormente selecionado do localStorage (se existir)
-        var selectedOption = localStorage.getItem('is_closed_option');
-
-        // Defina a opção selecionada no seletor
-        if (selectedOption !== null) {
-            $('#is_closed_option').val(selectedOption);
-        }
-
-        // Adicione um ouvinte de mudança ao seletor
-        $('#is_closed_option').on('change', function () {
-            // Salve a escolha do usuário no localStorage
-            localStorage.setItem('is_closed_option', $(this).val());
-        });
-    });
-</script>
-
-<!--<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script> -->
 
 {% endblock %}

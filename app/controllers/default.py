@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request,flash,redirect,url_for
 from app.api.tickets import make_api_request
 from flask_login import login_required  # Import your existing function
 from app import app
@@ -33,46 +33,48 @@ def index():
     ticketNumber = None
     is_closed_option = 'true'
 
-    if request.method == 'POST':
-        start_date = request.form.get('start_date')
-        end_date = request.form.get('end_date')
-        is_closed_option = request.form.get('is_closed_option', 'true')
+    try:
+        if request.method == 'POST':
+            start_date = request.form.get('start_date')
+            end_date = request.form.get('end_date')
+            is_closed_option = request.form.get('is_closed_option', 'true')
 
-        api_url = "https://api.tiflux.com/api/v1/tickets"
-        params = {
-            'limit': 200,
-            'start_date': start_date,
-            'end_date': end_date,
-            'is_closed': is_closed_option,
-        }
+            api_url = "https://api.tiflux.com/api/v1/tickets"
+            params = {
+                'limit': 200,
+                'start_date': start_date,
+                'end_date': end_date,
+                'is_closed': is_closed_option,
+            }
 
-        api_data = make_api_request(api_url, params)
+            api_data = make_api_request(api_url, params)
 
-        if api_data:
-            ticketNumber = api_data[0].get('ticket_number')
+            if api_data:
+                ticketNumber = api_data[0].get('ticket_number')
 
-        # Crie um gráfico de barras com Plotly
-        fig = create_bar_chart(api_data)
+            # Crie um gráfico de barras com Plotly
+            fig = create_bar_chart(api_data)
 
-        # Converter o gráfico Plotly para HTML como uma string
-        plot_html = fig.to_html(full_html=False)
+            # Converter o gráfico Plotly para HTML como uma string
+            plot_html = fig.to_html(full_html=False)
 
-        return render_template('index.html', api_data=api_data, ticketNumber=ticketNumber, plot=plot_html, calculate_duration=calculate_duration)
-    else:
-        api_data = make_api_request("https://api.tiflux.com/api/v1/tickets", {'limit': 200, 'is_closed': is_closed_option})
+            return render_template('index.html', api_data=api_data, ticketNumber=ticketNumber, plot=plot_html, calculate_duration=calculate_duration)
+        else:
+            api_data = make_api_request("https://api.tiflux.com/api/v1/tickets", {'limit': 200, 'is_closed': is_closed_option})
 
-        if api_data:
-            ticketNumber = api_data[0].get('ticket_number')
+            if api_data:
+                ticketNumber = api_data[0].get('ticket_number')
 
-        # Crie um gráfico de barras com Plotly
-        fig = create_bar_chart(api_data)
+            # Crie um gráfico de barras com Plotly
+            fig = create_bar_chart(api_data)
 
-        # Converter o gráfico Plotly para HTML como uma string
-        plot_html = fig.to_html(full_html=False)
+            # Converter o gráfico Plotly para HTML como uma string
+            plot_html = fig.to_html(full_html=False)
 
-        return render_template('index.html', api_data=api_data, ticketNumber=ticketNumber, plot=plot_html, calculate_duration=calculate_duration)
-
-
+            return render_template('index.html', api_data=api_data, ticketNumber=ticketNumber, plot=plot_html, calculate_duration=calculate_duration)
+    except KeyError as e:
+        flash(f"Não existe registro para a data fornecida.")
+        return redirect(url_for('index'))
 
 
 def create_bar_chart(api_data):
