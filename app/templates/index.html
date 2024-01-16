@@ -19,32 +19,46 @@
     </div>
   </div>
   <div class="container-fluid">
-    <form method="post" class="mb-3">
+    <form method="post" class="mb-3" id="filterForm">
       <div class="form-row">
-        <div class="col-md-4">
-          <label for="start_date">Start Date:</label>
-          <input type="date" class="form-control" id="start_date" name="start_date">
-        </div>
-        <div class="col-md-4">
-          <label for="end_date">End Date:</label>
-          <input type="date" class="form-control" id="end_date" name="end_date">
-        </div>
-        <div class="col-md-2">
-          <label class="invisible">Filter:</label>
-          <button type="submit" class="btn btn-primary btn-block ">Filter</button>
-        </div>
+          <div class="col-md-4">
+              <label for="start_date">Start Date:</label>
+              <input type="date" class="form-control" id="start_date" name="start_date">
+          </div>
+          <div class="col-md-4">
+              <label for="end_date">End Date:</label>
+              <input type="date" class="form-control" id="end_date" name="end_date">
+          </div>
+          <div class="col-md-2">
+              <label>Status de Fechamento:</label>
+              <div class="btn-group" role="group" aria-label="Status de Fechamento">
+                  <input type="radio" class="btn-check" name="is_closed_option" id="is_closed_true" value="true" autocomplete="off">
+                  <label class="btn btn-outline-primary" for="is_closed_true">Fechados</label>
+  
+                  <input type="radio" class="btn-check" name="is_closed_option" id="is_closed_false" value="false" autocomplete="off">
+                  <label class="btn btn-outline-primary" for="is_closed_false">Aberto</label>
+              </div>
+          </div>
+          <div class="col-md-2">
+              <label class="invisible">Filter:</label>
+              <button type="submit" class="btn btn-primary btn-block">Filter</button>
+          </div>
       </div>
-    </form>
-
+  </form>
+  
     <div class="table-responsive">
       <table id="ticketTable" class="table table-bordered table-striped">
         <thead class="thead-light">
           <tr>
             <th>Ticket Number</th>
             <th>Title</th>
-            <th>Responsible Name</th>
-            <th>Date</th>
-            <th>Apontamentos</th>
+            <th>Client</th>
+            <th>Responsible</th>
+            <th>created_Date</th>
+            <th>closing_date</th>
+            <th>call_duration</th>
+            <th>internship</th>
+            <th>appointments</th>
           </tr>
         </thead>
         <tbody>
@@ -52,8 +66,12 @@
           <tr>
             <td>{{ ticket.ticket_number }}</td>
             <td>{{ ticket.title }}</td>
+            <td>{{ ticket.client['name'] }}</td>
             <td>{{ ticket.responsible.name if ticket.responsible else '' }}</td>
             <td>{{ ticket.created_at }}</td>
+            <td>{{ ticket.updated_at }}</td>
+            <td>{{ calculate_duration(ticket.created_at, ticket.updated_at) }}</td>
+            <td>{{ ticket.stage['name']}}</td>
             <td><a class="btn btn-primary"
               href="{{ url_for('apontamentos', ticketNumber=ticket.ticket_number) }}">Apontamentos</a></td>
           </tr>
@@ -78,6 +96,22 @@
   $(document).on('change', '#start_date, #end_date', function (e) {
     e.preventDefault(); 
   });
+
+  $(document).ready(function () {
+        // Obtenha o valor anteriormente selecionado do localStorage (se existir)
+        var selectedOption = localStorage.getItem('is_closed_option');
+
+        // Defina a opção selecionada no seletor
+        if (selectedOption !== null) {
+            $('#is_closed_option').val(selectedOption);
+        }
+
+        // Adicione um ouvinte de mudança ao seletor
+        $('#is_closed_option').on('change', function () {
+            // Salve a escolha do usuário no localStorage
+            localStorage.setItem('is_closed_option', $(this).val());
+        });
+    });
 </script>
 
 <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script> -->
