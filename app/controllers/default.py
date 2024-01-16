@@ -6,7 +6,6 @@ from datetime import datetime
 import plotly.express as px
 import pandas as pd
 
-
 def calculate_duration(created_at, updated_at):
     formats = [
         '%Y-%m-%dT%H:%M:%S.%fZ',
@@ -56,7 +55,7 @@ def index():
             fig = create_bar_chart(api_data)
 
             # Crie um gráfico de barras por atendente no intervalo de datas
-            fig_responsible_on_date = create_bar_chart_by_responsible_on_date(api_data, start_date, end_date)
+            fig_responsible_on_date = create_bar_chart_by_responsible_on_date(api_data)
 
             # Converter os gráficos Plotly para HTML como strings
             plot_html = fig.to_html(full_html=False)
@@ -64,8 +63,20 @@ def index():
 
             return render_template('index.html', api_data=api_data, ticketNumber=ticketNumber, plot=plot_html, plot_responsible_on_date=plot_responsible_on_date_html, calculate_duration=calculate_duration)
         else:
-            # Restante do código permanece o mesmo
-            pass
+           
+            api_data = make_api_request("https://api.tiflux.com/api/v1/tickets", {'limit': 200, 'is_closed': is_closed_option})
+
+            if api_data:
+                ticketNumber = api_data[0].get('ticket_number')
+
+            # Crie um gráfico de barras com Plotly
+            fig = create_bar_chart(api_data)
+            fig_responsible_on_date = create_bar_chart_by_responsible_on_date(api_data)
+
+            # Converter os gráficos Plotly para HTML como strings
+            plot_html = fig.to_html(full_html=False)
+            plot_responsible_on_date_html = fig_responsible_on_date.to_html(full_html=False)
+            return render_template('index.html', api_data=api_data, ticketNumber=ticketNumber, plot=plot_html,plot_responsible_on_date=plot_responsible_on_date_html ,calculate_duration=calculate_duration)
     except KeyError as e:
         flash(f"Não existe registro para a data fornecida.")
         return redirect(url_for('index'))
@@ -96,29 +107,25 @@ def create_bar_chart(api_data):
 
     return fig
 
-def create_bar_chart_by_responsible_on_date(api_data, start_date, end_date):
+def create_bar_chart_by_responsible_on_date(api_data):
     df = pd.DataFrame(api_data)
-
-    # Filtrar os dados para o intervalo de datas
-    df['created_at'] = pd.to_datetime(df['created_at'])
-    df_date_range = df[(df['created_at'].dt.date >= pd.to_datetime(start_date).date()) & (df['created_at'].dt.date <= pd.to_datetime(end_date).date())]
-
-    # Contar o número de tickets por atendente no intervalo de datas
-    responsible_counts = df_date_range['responsible'].apply(lambda x: x['name'] if pd.notnull(x) else 'Unassigned').value_counts().reset_index()
+    # Contar o número de tickets por responsável
+    responsible_counts = df['responsible'].apply(lambda x: x['name'] if pd.notnull(x) else 'Unassigned').value_counts().reset_index()
     responsible_counts.columns = ['responsible', 'count']
     responsible_counts = responsible_counts.sort_values(by='responsible')
 
     # Criar o gráfico de barras
-    fig = px.bar(responsible_counts, x='responsible', y='count', title=f'Tickets por Atendente de {start_date} a {end_date}',
-                  labels={'count': 'Número de Tickets', 'responsible': 'Atendente'},
+    fig = px.bar(responsible_counts, x='responsible', y='count', title='Tickets por Responsável',
+                  labels={'count': 'Número de Tickets', 'responsible': 'Responsável'},
                   template='plotly')
 
-   # Adicionar rótulos nas barras
+    # Adicionar rótulos nas barras
     fig.update_traces(texttemplate='%{y}', textposition='outside')
-
 
     # Ajustes de layout para evitar corte
     fig.update_layout(margin=dict(t=0, b=0, l=0, r=0))
 
     return fig
+
+
 
