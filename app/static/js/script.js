@@ -1,7 +1,16 @@
-  // Initialize DataTable
-  $(document).ready(function () {
-    $('#ticketTable').DataTable();
+$(document).ready(function () {
+  var table = $('#ticketTable').DataTable({
+      "lengthMenu": [10, 25, 50, 100, 200], // Defina os valores desejados
+      "pageLength": 10 // Defina o valor padrão
   });
+
+  // Adiciona um botão para mostrar todos os registros
+  $('<button>Show All</button>').appendTo('#ticketTable_wrapper .dataTables_length')
+      .on('click', function () {
+          table.page.len(-1).draw();
+      });
+});
+
 
   $(document).on('change', '#start_date, #end_date', function (e) {
     e.preventDefault(); 

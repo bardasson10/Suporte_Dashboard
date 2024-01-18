@@ -40,6 +40,7 @@ def index():
 
             api_url = "https://api.tiflux.com/api/v1/tickets"
             params = {
+
                 'limit': 200,
                 'start_date': start_date,
                 'end_date': end_date,
@@ -92,7 +93,7 @@ def create_bar_chart(api_data):
     data_counts.columns = ['date', 'count']
     data_counts = data_counts.sort_values(by='date')
 
-    fig = px.bar(data_counts, x='date', y='count', title='Tickets por Dia',
+    fig = px.bar(data_counts, x='date', y='count',
                  labels={'count': 'Número de Tickets', 'date': 'Data'},
                  template='plotly')
 
@@ -115,7 +116,7 @@ def create_bar_chart_by_responsible_on_date(api_data):
     responsible_counts = responsible_counts.sort_values(by='responsible')
 
     # Criar o gráfico de barras
-    fig = px.bar(responsible_counts, x='responsible', y='count', title='Tickets por Responsável',
+    fig = px.bar(responsible_counts, x='responsible', y='count',
                   labels={'count': 'Número de Tickets', 'responsible': 'Responsável'},
                   template='plotly')
 
