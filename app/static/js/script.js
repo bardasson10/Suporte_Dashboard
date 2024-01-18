@@ -4,11 +4,6 @@ $(document).ready(function () {
       "pageLength": 10 // Defina o valor padrão
   });
 
-  // Adiciona um botão para mostrar todos os registros
-  $('<button>Show All</button>').appendTo('#ticketTable_wrapper .dataTables_length')
-      .on('click', function () {
-          table.page.len(-1).draw();
-      });
 });
 
 
