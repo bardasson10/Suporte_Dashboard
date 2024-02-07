@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Cadastro</title>
-    <!-- Vincule o arquivo CSS externo da pasta static -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro_dash.css') }}">
-    <!-- Vincule o arquivo JS externo da pasta static -->
-    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% extends 'base.html' %}
+{% block title %} {{ super() }} - Postos {% endblock %}
+{% block content %}
 
-{% macro get_field_value(ticket, field_id) %}
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="margin-bottom: 100px;">
+    <form method="post" action="{{ url_for('postos') }}">
+        <button type="submit">Sincronizar Dados</button>
+    </form>
+    {% macro get_field_value(ticket, field_id) %}
     {% for entity in ticket.entities %}
         {% for field in entity.fields %}
             {% if field.field_id == field_id %}
@@ -32,17 +29,7 @@
         {% endfor %}
     {% endfor %}
 {% endmacro %}
-
-</head>
-
-<body>
-    <div class="search-container">
-        <form action="/search" method="GET">
-            <input type="text" name="query" placeholder="Pesquisar...">
-            <button type="submit">Pesquisar</button>
-        </form>
-    </div>
-    {% if api_data %}
+{% if api_data %}
         <div class="card-container">
             {% for ticket in api_data %}
                 <div class="card">
@@ -68,7 +55,7 @@
                         <span class="value">{{ get_field_value(ticket, 12478) }}</span>
                     </div>
                     <div class="card-item">
-                        <span class="label rede">REDE:</span>
+                        <span class="label rede">Rede:</span>
                         <span class="value">{{ get_field_value(ticket, 12482) }}</span>
                     </div>
                     <div class="card-item">
@@ -91,12 +78,14 @@
                         <span class="label provider">Provider:</span>
                         <span class="value">{{ get_field_value(ticket, 5312) }}</span>
                     </div>
-                    <!-- ... (outros campos) ... -->
                 </div>
             {% endfor %}
         </div>
     {% else %}
         <p class="no-data">Nenhum dado disponível.</p>
     {% endif %}
-</body>
-</html>
+                       
+
+</main>
+
+    {% endblock %}
