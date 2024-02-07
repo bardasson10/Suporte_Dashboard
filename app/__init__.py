@@ -23,3 +23,4 @@ migrate = Migrate(app, db)
 from app.controllers import default
 from app.controllers import logincontroller
 from app.controllers import apontamentocontroller
+from app.controllers import cadastrocontroller

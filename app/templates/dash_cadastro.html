@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Cadastro</title>
+    <!-- Vincule o arquivo CSS externo da pasta static -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro_dash.css') }}">
+    <!-- Vincule o arquivo JS externo da pasta static -->
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+
+{% macro get_field_value(ticket, field_id) %}
+    {% for entity in ticket.entities %}
+        {% for field in entity.fields %}
+            {% if field.field_id == field_id %}
+                {% if field.field_type == 'single_select' %}
+                    {% for option in field.options %}
+                        {% if option.value == 'true' %}
+                            {{ option.option_name or option.value }}
+                        {% endif %}
+                    {% endfor %}
+                {% elif field.field_type == 'checkbox' %}
+                    {% for option in field.options %}
+                        {% if option.value == 'true' %}
+                            {{ option.option_name or option.value }}
+                        {% endif %}
+                    {% endfor %}
+                {% elif field.field_type == 'text' %}
+                    {{ field.options.0.value or '' }}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endmacro %}
+
+</head>
+
+<body>
+    <div class="search-container">
+        <form action="/search" method="GET">
+            <input type="text" name="query" placeholder="Pesquisar...">
+            <button type="submit">Pesquisar</button>
+        </form>
+    </div>
+    {% if api_data %}
+        <div class="card-container">
+            {% for ticket in api_data %}
+                <div class="card">
+                    <div class="card-item">
+                        <span class="label">Nome:</span>
+                        <span class="value">{{ ticket.title.split('-')[0] | trim }}</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="label cnpj">CNPJ:</span>
+                        <span class="value">{{ get_field_value(ticket, 12477) }}</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="label stid">STID:</span>
+                        <span class="value">{{ get_field_value(ticket, 12479) }}</span>
+                    </div>
+                    <!-- Adicione mais campos conforme necessário -->
+                    <div class="card-item">
+                        <span class="label bsid">BSID:</span>
+                        <span class="value">{{ get_field_value(ticket, 12480) }}</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="label ec">EC:</span>
+                        <span class="value">{{ get_field_value(ticket, 12478) }}</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="label rede">REDE:</span>
+                        <span class="value">{{ get_field_value(ticket, 12482) }}</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="label fabricante">Fabricante:</span>
+                        <span class="value">{{ get_field_value(ticket, 5307) }}</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="label serial-number">SerialNumber:</span>
+                        <span class="value">{{ get_field_value(ticket, 5313) }}</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="label modelo">Modelo da Automação:</span>
+                        <span class="value">{{ get_field_value(ticket, 5311) }}</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="label bandeira">Bandeira:</span>
+                        <span class="value">{{ get_field_value(ticket, 12481) }}</span>
+                    </div>
+                    <div class="card-item">
+                        <span class="label provider">Provider:</span>
+                        <span class="value">{{ get_field_value(ticket, 5312) }}</span>
+                    </div>
+                    <!-- ... (outros campos) ... -->
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-data">Nenhum dado disponível.</p>
+    {% endif %}
+</body>
+</html>
