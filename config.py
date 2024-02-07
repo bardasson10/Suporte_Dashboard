@@ -4,7 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 DEBUG = True
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+
+
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI') banco de dados gay jon
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1829032422@localhost/dashboard_sup?client_encoding=utf8'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True  # Desativa o rastreamento de modificações
 # config.py
 
