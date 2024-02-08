@@ -3,6 +3,7 @@
 {% block content %}
 
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="margin-bottom: 100px;">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro_dash.css') }}">
     <form method="post" action="{{ url_for('postos') }}">
         <button type="submit">Sincronizar Dados</button>
     </form>
