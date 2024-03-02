@@ -1,6 +1,5 @@
 import logging
 from logging.config import fileConfig
-from app.models.tables import User  # Adicione esta linha
 
 from flask import current_app
 
